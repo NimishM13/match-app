@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import {
     loginSchema,
     LoginSchema,
-} from "@/app/lib/schemas/LoginSchema";
+} from "@/lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInUser } from "@/app/actions/authActions";
 import { useRouter } from "next/navigation";
@@ -37,7 +37,7 @@ export default function LoginForm() {
 
     const router = useRouter();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const onSubmit = async (data: LoginSchema) => {
         console.log({ data })
         // const result = await signInUser(data);
