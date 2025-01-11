@@ -15,8 +15,6 @@ import {
     LoginSchema,
 } from "@/lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signInUser } from "@/app/actions/authActions";
-import { useRouter } from "next/navigation";
 // import { toast } from "react-toastify";
 import Link from "next/link";
 // import SocialLogin from "./SocialLogin";
@@ -26,7 +24,7 @@ export default function LoginForm() {
         register,
         handleSubmit,
         formState: { isValid, errors },
-    } = useForm<loginSchema>({
+    } = useForm<LoginSchema>({
         resolver: zodResolver(loginSchema),
         mode: "onChange",
         defaultValues: {
@@ -34,9 +32,6 @@ export default function LoginForm() {
             password: "",
         },
     });
-
-    const router = useRouter();
-
      
     const onSubmit = async (data: LoginSchema) => {
         console.log({ data })
