@@ -15,9 +15,11 @@ import {
     LoginSchema,
 } from "@/lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Link from "next/link";
+import { signInUser } from "@/app/actions/authActions";
 // import SocialLogin from "./SocialLogin";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
     const {
@@ -32,16 +34,18 @@ export default function LoginForm() {
             password: "",
         },
     });
-     
+
+    const router = useRouter();
+
     const onSubmit = async (data: LoginSchema) => {
         console.log({ data })
-        // const result = await signInUser(data);
-        // if (result.status === "success") {
-        //   router.push("/members");
-        //   router.refresh();
-        // } else {
-        //   toast.error(result.error as string);
-        // }
+        const result = await signInUser(data);
+        if (result.status === "success") {
+            router.push("/members");
+            router.refresh();
+        } else {
+            toast.error(result.error as string);
+        }
     };
 
     return (
