@@ -1,20 +1,34 @@
 'use server';
 
-import { signIn, signOut } from '@/auth';
+import {  signOut } from 'next-auth/react';
 import { prisma } from '@/lib/prisma';
-import { LoginSchema } from '@/lib/schemas/LoginSchema';
+import { LoginSchema, loginSchema } from '@/lib/schemas/LoginSchema';
 import { registerSchema, RegisterSchema } from '@/lib/schemas/RegisterSchema';
 import { ActionResult } from '@/types';
 import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { compare } from "bcryptjs";
 
 export async function signInUser(data: LoginSchema): Promise<ActionResult<string>> {
 	try {
-		await signIn('credentials', {
-			email: data.email,
-			password: data.password,
-			redirect: false
-		});
+		const validated = loginSchema.safeParse(data);
+		if (!validated.success) {
+			return { status: "error", error: "Invalid credentials format" };
+		}
+
+		const { email, password } = validated.data;
+
+		// Fetch the user from the database
+		const user = await prisma.user.findUnique({ where: { email } });
+		if (!user) {
+			return { status: "error", error: "User not found" };
+		}
+
+		// Verify the password
+		const isPasswordValid = await compare(password, user.passwordHash);
+		if (!isPasswordValid) {
+			return { status: "error", error: "Incorrect password" };
+		}
 
 		return { status: 'success', data: 'Logged in' }
 	} catch (error) {
@@ -24,7 +38,7 @@ export async function signInUser(data: LoginSchema): Promise<ActionResult<string
 }
 
 export async function signOutUser() {
-	await signOut({ redirectTo: '/' });
+	await signOut({ redirect: false, callbackUrl: '/' });
 }
 
 export async function registerUser(data: RegisterSchema): Promise<ActionResult<User>> {
